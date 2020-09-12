@@ -6,7 +6,6 @@ import logging
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
-from . import ENV_VARS
 from .uptimeRobot import UptimeRobot
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -15,9 +14,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-class TamrielUptimeBot:
-    def __init__(self):
-        self.uptimeRobot: UptimeRobot = UptimeRobot(ENV_VARS['UPTIMEROBOT_API_KEY'])
+class TelegramUptimeBot:
+    def __init__(self, telegram_bot_token: str, uptimerobot_api_key: str):
+        self.telegram_bot_token = telegram_bot_token
+        self.uptimeRobot: UptimeRobot = UptimeRobot(uptimerobot_api_key)
 
     def start(self, update: Update, context: CallbackContext):
         """Send a message when the command /start is issued."""
@@ -28,7 +28,7 @@ class TamrielUptimeBot:
         update.message.reply_text('''
         Available commands:
         /start - to start bot dialog (not required)
-        /status - returns statuses of Tamriel UptimeRobot monitors
+        /status - returns statuses of UptimeRobot monitors
         /help - returns this dialog
         ''')
 
@@ -47,7 +47,7 @@ class TamrielUptimeBot:
 
     def main(self):
         """Bot main driver"""
-        updater = Updater(ENV_VARS['TELEGRAM_BOT_TOKEN'], use_context=True)
+        updater = Updater(self.telegram_bot_token, use_context=True)
 
         # Get the dispatcher to register handlers
         dp = updater.dispatcher
